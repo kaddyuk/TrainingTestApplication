@@ -14,7 +14,7 @@ public partial class App : Application
     public IDbContextFactory<TechRecordsDbContext> DbContextFactory { get; set; }
     public App()
     {
-        var connString = "Server=(local);Initial Catalog=ENVATS;Integrated Security=true";
+        var connString = "Server=(local);Initial Catalog=ENVPAE;Integrated Security=true";
         DbContextFactory = new DbContextFactory<TechRecordsDbContext>(connString);
     }
 

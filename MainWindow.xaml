@@ -2,10 +2,13 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:viewmodels="clr-namespace:TrainingTestApplication.ViewModels"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:viewmodels="clr-namespace:TrainingTestApplication.ViewModels"
+         xmlns:base="clr-namespace:TrainingTestApplication"
         d:DataContext="{d:DesignInstance {x:Type viewmodels:MainWindowViewModel}, IsDesignTimeCreatable=False}"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="800"
+        >
     <Window.Resources>
         <DataTemplate x:Key="groupHeaderTemplate">
             <TextBlock Text="{Binding Name}"/>
@@ -36,9 +39,21 @@
                   CanUserAddRows="False"
                   VirtualizingPanel.IsVirtualizingWhenGrouping="True"
                   >
+            <DataGrid.Resources>
+                <Style TargetType="Expander">
+                    <EventSetter Event="Expanded" Handler="expander_OnExpandedStateChanged" />
+                    <EventSetter Event="Collapsed" Handler="expander_OnExpandedStateChanged" />
+                </Style>
+                <viewmodels:ExpanderStateConverter x:Key="ExpanderStateConverter" />
+            </DataGrid.Resources>
             <DataGrid.GroupStyle>
                 <!-- Style for groups at top level. -->
                 <GroupStyle>
+                    <GroupStyle.Panel>
+                        <ItemsPanelTemplate>
+                            <DataGridRowsPresenter/>
+                        </ItemsPanelTemplate>
+                    </GroupStyle.Panel>
                     <GroupStyle.ContainerStyle>
                         <Style TargetType="{x:Type GroupItem}">
                             <Setter Property="Margin" Value="0,0,0,5"/>
@@ -46,7 +61,13 @@
                                 <Setter.Value>
                                     <ControlTemplate TargetType="{x:Type GroupItem}">
                                         <Border BorderBrush="DarkBlue" BorderThickness="0">
-                                            <Expander Background="AliceBlue" Foreground="Black" Margin="0">
+                                            <Expander Background="AliceBlue" Foreground="Black" Margin="0" >
+                                                <Expander.IsExpanded>
+                                                    <MultiBinding Converter="{StaticResource ResourceKey=ExpanderStateConverter}" Mode="OneWay" >
+                                                        <Binding Mode="OneWay"/>
+                                                        <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type base:MainWindow}}" Path="ExpandedExpanders" />
+                                                    </MultiBinding>
+                                                </Expander.IsExpanded>
                                                 <Expander.Header>
                                                     <TextBlock FontSize="18" Margin="2">
                                                         <TextBlock.Text>

@@ -2,7 +2,10 @@
 using EnvisionClient.Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel;
+using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
 
 namespace TrainingTestApplication.ViewModels;
@@ -33,6 +36,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
         if(PartNumberCollectionView.CanGroup)
         {
             PartNumberCollectionView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(PartNumber.Model)));
+            PartNumberCollectionView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(PartNumber.PartClassification)));
         }
     }
 
@@ -147,4 +151,30 @@ public class MainWindowViewModel : INotifyPropertyChanged
     }
 
     public ICollectionView? PartNumberCollectionView { get => partNumberCollectionView; set => SetProperty(ref partNumberCollectionView, value); }
+
+}
+
+
+
+public class ExpanderStateConverter : IMultiValueConverter
+{
+
+    public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+    {
+        CollectionViewGroup collectionViewGroup = values[0] as CollectionViewGroup;
+        List<string> expandersStates = values[1] as List<string>;
+        if (!expandersStates.Any())
+        {//prevent forming group identifier to speed up process as there are no expanded expanders anyway
+            return false;
+        }
+
+        string groupId = MainWindow.FormViewGroupIdentifier(collectionViewGroup, null);
+        bool contains = expandersStates.Contains(groupId);
+        return contains;
+    }
+
+    public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+    {
+        return new object[2];
+    }
 }
